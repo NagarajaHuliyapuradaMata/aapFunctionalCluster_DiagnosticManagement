@@ -20,6 +20,11 @@
 /******************************************************************************/
 /* TYPEDEFS                                                                   */
 /******************************************************************************/
+class interface_DiagnosticManagement_CancellationHandler{
+   public:
+      virtual void IsCanceled  (void) = 0;
+      virtual void SetNotifier (void) = 0;
+};
 
 /******************************************************************************/
 /* CONSTS                                                                     */

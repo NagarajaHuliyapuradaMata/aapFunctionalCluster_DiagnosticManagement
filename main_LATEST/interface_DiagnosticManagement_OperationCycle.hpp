@@ -20,6 +20,12 @@
 /******************************************************************************/
 /* TYPEDEFS                                                                   */
 /******************************************************************************/
+class interface_DiagnosticManagement_OperationCycle{
+   public:
+      virtual void GetOperationCycle (void) = 0;
+//    virtual void SetNotifier       (void) = 0;
+      virtual void SetOperationCycle (void) = 0;
+};
 
 /******************************************************************************/
 /* CONSTS                                                                     */
