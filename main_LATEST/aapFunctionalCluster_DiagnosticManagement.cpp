@@ -14,6 +14,11 @@
 #include "interface_DiagnosticManagement_Condition.hpp"
 #include "interface_DiagnosticManagement_OperationCycle.hpp"
 #include "interface_DiagnosticManagement_Indicator.hpp"
+#include "interface_DiagnosticManagement_Monitor.hpp"
+#include "interface_DiagnosticManagement_Event.hpp"
+#include "interface_DiagnosticManagement_MultipleCondition.hpp"
+#include "interface_DiagnosticManagement_MultipleEvent.hpp"
+#include "interface_DiagnosticManagement_MultipleMonitor.hpp"
 
 /******************************************************************************/
 /* #DEFINES                                                                   */
@@ -34,6 +39,11 @@ class aapFunctionalCluster_DiagnosticManagement:
    ,  public interface_DiagnosticManagement_Condition
    ,  public interface_DiagnosticManagement_OperationCycle
    ,  public interface_DiagnosticManagement_Indicator
+   ,  public interface_DiagnosticManagement_Monitor
+   ,  public interface_DiagnosticManagement_Event
+   ,  public interface_DiagnosticManagement_MultipleCondition
+   ,  public interface_DiagnosticManagement_MultipleEvent
+   ,  public interface_DiagnosticManagement_MultipleMonitor
 {
    public:
       void         GetActivityStatus                   (void);
@@ -72,11 +82,38 @@ class aapFunctionalCluster_DiagnosticManagement:
       void         SetCondition                        (void);
 
       void         GetOperationCycle                   (void);
-      void         SetNotifier                         (void);
+//    void         SetNotifier                         (void);
       void         SetOperationCycle                   (void);
 
       void         GetIndicator                        (void);
-      void         SetNotifier                         (void);
+//    void         SetNotifier                         (void);
+
+      void         Offer                               (void);
+      void         ReportMonitorAction                 (void);
+      void         StopOffer                           (void);
+
+      void         GetDebouncingStatus                 (void);
+      void         GetDTCNumber                        (void);
+      void         GetEventStatus                      (void);
+      void         GetFaultDetectionCounter            (void);
+      void         GetLatchedWIRStatus                 (void);
+      void         GetTestComplete                     (void);
+      void         SetEventStatusChangedNotifier       (void);
+      void         SetLatchedWIRStatus                 (void);
+
+//    void         GetCondition                        (void);
+//    void         SetCondition                        (void);
+
+//    void         GetDebouncingStatus                 (void);
+//    void         GetDTCNumber                        (void);
+//    void         GetEventStatus                      (void);
+//    void         GetFaultDetectionCounter            (void);
+//    void         SetEventStatusChangedNotifier       (void);
+
+      void         ConfigureMonitor                    (void);
+//    void         Offer                               (void);
+//    void         ReportMonitorAction                 (void);
+//    void         StopOffer                           (void);
 };
 
 /******************************************************************************/
@@ -193,8 +230,8 @@ void aapFunctionalCluster_DiagnosticManagement::SetCondition(void){
 void aapFunctionalCluster_DiagnosticManagement::GetOperationCycle(void){
 }
 
-void aapFunctionalCluster_DiagnosticManagement::SetNotifier(void){
-}
+//void aapFunctionalCluster_DiagnosticManagement::SetNotifier(void){
+//}
 
 void aapFunctionalCluster_DiagnosticManagement::SetOperationCycle(void){
 }
@@ -204,6 +241,76 @@ void aapFunctionalCluster_DiagnosticManagement::GetIndicator(void){
 }
 
 //void aapFunctionalCluster_DiagnosticManagement::SetNotifier(void){
+//}
+
+void aapFunctionalCluster_DiagnosticManagement::Offer(void){
+}
+
+void aapFunctionalCluster_DiagnosticManagement::ReportMonitorAction(void){
+}
+
+void aapFunctionalCluster_DiagnosticManagement::StopOffer(void){
+}
+
+
+void aapFunctionalCluster_DiagnosticManagement::GetDebouncingStatus(void){
+}
+
+void aapFunctionalCluster_DiagnosticManagement::GetDTCNumber(void){
+}
+
+void aapFunctionalCluster_DiagnosticManagement::GetEventStatus(void){
+}
+
+void aapFunctionalCluster_DiagnosticManagement::GetFaultDetectionCounter(void){
+}
+
+void aapFunctionalCluster_DiagnosticManagement::GetLatchedWIRStatus(void){
+}
+
+void aapFunctionalCluster_DiagnosticManagement::GetTestComplete(void){
+}
+
+void aapFunctionalCluster_DiagnosticManagement::SetEventStatusChangedNotifier(void){
+}
+
+void aapFunctionalCluster_DiagnosticManagement::SetLatchedWIRStatus(void){
+}
+
+
+//void aapFunctionalCluster_DiagnosticManagement::GetCondition(void){
+//}
+
+//void aapFunctionalCluster_DiagnosticManagement::SetCondition(void){
+//}
+
+
+//void aapFunctionalCluster_DiagnosticManagement::GetDebouncingStatus(void){
+//}
+
+//void aapFunctionalCluster_DiagnosticManagement::GetDTCNumber(void){
+//}
+
+//void aapFunctionalCluster_DiagnosticManagement::GetEventStatus(void){
+//}
+
+//void aapFunctionalCluster_DiagnosticManagement::GetFaultDetectionCounter(void){
+//}
+
+//void aapFunctionalCluster_DiagnosticManagement::SetEventStatusChangedNotifier(void){
+//}
+
+
+void aapFunctionalCluster_DiagnosticManagement::ConfigureMonitor(void){
+}
+
+//void aapFunctionalCluster_DiagnosticManagement::Offer(void){
+//}
+
+//void aapFunctionalCluster_DiagnosticManagement::ReportMonitorAction(void){
+//}
+
+//void aapFunctionalCluster_DiagnosticManagement::StopOffer(void){
 //}
 
 /******************************************************************************/

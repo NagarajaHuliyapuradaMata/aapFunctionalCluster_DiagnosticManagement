@@ -20,6 +20,11 @@
 /******************************************************************************/
 /* TYPEDEFS                                                                   */
 /******************************************************************************/
+class interface_DiagnosticManagement_MultipleCondition{
+   public:
+//    virtual void GetCondition (void) = 0;
+//    virtual void SetCondition (void) = 0;
+};
 
 /******************************************************************************/
 /* CONSTS                                                                     */

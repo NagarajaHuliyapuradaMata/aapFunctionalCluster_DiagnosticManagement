@@ -1,6 +1,6 @@
 #pragma once
 /******************************************************************************/
-/* File   : interface_DiagnosticManagement_Event.hpp                          */
+/* File   : interface_DiagnosticManagement_Monitor.hpp                        */
 /* Author : Nagaraja HULIYAPURADA-MATA                                        */
 /* Date   : 01.02.1982                                                        */
 /******************************************************************************/
@@ -20,16 +20,11 @@
 /******************************************************************************/
 /* TYPEDEFS                                                                   */
 /******************************************************************************/
-class interface_DiagnosticManagement_Event{
+class interface_DiagnosticManagement_Monitor{
    public:
-      virtual void GetDebouncingStatus           (void) = 0;
-      virtual void GetDTCNumber                  (void) = 0;
-      virtual void GetEventStatus                (void) = 0;
-      virtual void GetFaultDetectionCounter      (void) = 0;
-      virtual void GetLatchedWIRStatus           (void) = 0;
-      virtual void GetTestComplete               (void) = 0;
-      virtual void SetEventStatusChangedNotifier (void) = 0;
-      virtual void SetLatchedWIRStatus           (void) = 0;
+      virtual void Offer               (void) = 0;
+      virtual void ReportMonitorAction (void) = 0;
+      virtual void StopOffer           (void) = 0;
 };
 
 /******************************************************************************/

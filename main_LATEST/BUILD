@@ -15,6 +15,7 @@ cc_library(
          ,  "interface_DiagnosticManagement_Event.hpp"
          ,  "interface_DiagnosticManagement_Indicator.hpp"
          ,  "interface_DiagnosticManagement_MetaInfo.hpp"
+         ,  "interface_DiagnosticManagement_Monitor.hpp"
          ,  "interface_DiagnosticManagement_MultipleCondition.hpp"
          ,  "interface_DiagnosticManagement_MultipleEvent.hpp"
          ,  "interface_DiagnosticManagement_MultipleMonitor.hpp"

@@ -20,6 +20,14 @@
 /******************************************************************************/
 /* TYPEDEFS                                                                   */
 /******************************************************************************/
+class interface_DiagnosticManagement_MultipleEvent{
+   public:
+//    virtual void GetDebouncingStatus           (void) = 0;
+//    virtual void GetDTCNumber                  (void) = 0;
+//    virtual void GetEventStatus                (void) = 0;
+//    virtual void GetFaultDetectionCounter      (void) = 0;
+//    virtual void SetEventStatusChangedNotifier (void) = 0;
+};
 
 /******************************************************************************/
 /* CONSTS                                                                     */
