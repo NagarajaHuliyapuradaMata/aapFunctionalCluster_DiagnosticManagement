@@ -1,6 +1,6 @@
 #pragma once
 /******************************************************************************/
-/* File   : interface_DiagnosticManagement_Conversation.hpp                   */
+/* File   : infClientSwcServiceDcm.hpp                                        */
 /* Author : Nagaraja HULIYAPURADA-MATA                                        */
 /* Date   : 01.02.1982                                                        */
 /******************************************************************************/
@@ -20,23 +20,11 @@
 /******************************************************************************/
 /* TYPEDEFS                                                                   */
 /******************************************************************************/
-typedef unsigned char Conversation;
-
-class interface_DiagnosticManagement_Conversation{
+class infClientSwcServiceDcm{
    public:
-      virtual void         GetActivityStatus                   (void) = 0;
-      virtual void         GetAllConversations                 (void) = 0;
-      virtual Conversation GetConversation                     (void) = 0;
-      virtual void         GetConversationIdentifier           (void) = 0;
-      virtual void         GetCurrentActiveConversations       (void) = 0;
-      virtual void         GetDiagnosticSecurityLevel          (void) = 0;
-      virtual void         GetDiagnosticSecurityLevelShortName (void) = 0;
-      virtual void         GetDiagnosticSession                (void) = 0;
-      virtual void         GetDiagnosticSessionShortName       (void) = 0;
-      virtual void         ResetToDefaultSession               (void) = 0;
-      virtual void         SetActivityNotifier                 (void) = 0;
-      virtual void         SetDiagnosticSessionNotifier        (void) = 0;
-      virtual void         SetSecurityLevelNotifier            (void) = 0;
+      virtual void vInitFunction    (void) = 0;
+      virtual void vProcessResponse (void) = 0;
+      virtual void vMainFunction    (void) = 0;
 };
 
 /******************************************************************************/
@@ -50,6 +38,7 @@ class interface_DiagnosticManagement_Conversation{
 /******************************************************************************/
 /* OBJECTS                                                                    */
 /******************************************************************************/
+extern infClientSwcServiceDcm* pstinfClientSwcServiceDcm;
 
 /******************************************************************************/
 /* FUNCTIONS                                                                  */

@@ -7,6 +7,12 @@
 /******************************************************************************/
 /* #INCLUDES                                                                  */
 /******************************************************************************/
+#include "TypesStd.hpp"
+
+#include "infClientSwcServiceDcm.hpp"
+#include "infClientSwcServiceEcuM.hpp"
+#include "infClientSwcServiceEthTp.hpp"
+
 #include "interface_DiagnosticManagement_Conversation.hpp"
 #include "interface_DiagnosticManagement_DTCInformation.hpp"
 #include "interface_DiagnosticManagement_CancellationHandler.hpp"
@@ -20,6 +26,9 @@
 #include "interface_DiagnosticManagement_MultipleEvent.hpp"
 #include "interface_DiagnosticManagement_MultipleMonitor.hpp"
 
+#include <iostream>
+#include <cstring>
+
 /******************************************************************************/
 /* #DEFINES                                                                   */
 /******************************************************************************/
@@ -32,7 +41,8 @@
 /* TYPEDEFS                                                                   */
 /******************************************************************************/
 class aapFunctionalCluster_DiagnosticManagement:
-      public interface_DiagnosticManagement_Conversation
+      public infClientSwcServiceDcm
+   ,  public interface_DiagnosticManagement_Conversation
    ,  public interface_DiagnosticManagement_DTCInformation
    ,  public interface_DiagnosticManagement_CancellationHandler
    ,  public interface_DiagnosticManagement_MetaInfo
@@ -45,6 +55,10 @@ class aapFunctionalCluster_DiagnosticManagement:
    ,  public interface_DiagnosticManagement_MultipleEvent
    ,  public interface_DiagnosticManagement_MultipleMonitor
 {
+   private:
+      sint8 as8Request[1024];
+      sint8 as8Response[1024];
+
    public:
       void         GetActivityStatus                   (void);
       void         GetAllConversations                 (void);
@@ -114,6 +128,10 @@ class aapFunctionalCluster_DiagnosticManagement:
 //    void         Offer                               (void);
 //    void         ReportMonitorAction                 (void);
 //    void         StopOffer                           (void);
+
+      void         vInitFunction                       (void);
+      void         vProcessResponse                    (void);
+      void         vMainFunction                       (void);
 };
 
 /******************************************************************************/
@@ -127,6 +145,8 @@ class aapFunctionalCluster_DiagnosticManagement:
 /******************************************************************************/
 /* OBJECTS                                                                    */
 /******************************************************************************/
+aapFunctionalCluster_DiagnosticManagement DiagnosticManagement;
+infClientSwcServiceDcm*                   pstinfClientSwcServiceDcm = &DiagnosticManagement;
 
 /******************************************************************************/
 /* FUNCTIONS                                                                  */
@@ -312,6 +332,36 @@ void aapFunctionalCluster_DiagnosticManagement::ConfigureMonitor(void){
 
 //void aapFunctionalCluster_DiagnosticManagement::StopOffer(void){
 //}
+
+void aapFunctionalCluster_DiagnosticManagement::vInitFunction(void){
+}
+
+void aapFunctionalCluster_DiagnosticManagement::vProcessResponse(void){
+   if(
+         0
+      == strcmp(
+                             "025101"
+            ,  (const char*) this->as8Response
+         )
+   ){
+      SwcServiceEcuM.vSetRequestShutdown(TRUE);
+   }
+}
+
+void aapFunctionalCluster_DiagnosticManagement::vMainFunction(void){
+   std::cout << "client\t: ";
+   std::cin >> this->as8Request;
+   SwcServiceEthTp.vWrite(
+         this->as8Request
+      ,  1024
+   );
+   SwcServiceEthTp.vRead(
+         this->as8Response
+      ,  1024
+   );
+   this->vProcessResponse();
+   std::cout << "server\t: " << this->as8Response << std::endl;
+}
 
 /******************************************************************************/
 /* EOF                                                                        */
