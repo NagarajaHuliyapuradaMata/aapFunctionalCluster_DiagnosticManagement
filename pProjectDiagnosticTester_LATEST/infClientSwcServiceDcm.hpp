@@ -38,7 +38,7 @@ class infClientSwcServiceDcm{
 /******************************************************************************/
 /* OBJECTS                                                                    */
 /******************************************************************************/
-extern infClientSwcServiceDcm* pstinfClientSwcServiceDcm;
+extern infClientSwcServiceDcm* const cpstinfClientSwcServiceDcm;
 
 /******************************************************************************/
 /* FUNCTIONS                                                                  */

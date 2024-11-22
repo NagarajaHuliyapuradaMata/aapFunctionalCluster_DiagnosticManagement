@@ -146,7 +146,7 @@ class aapFunctionalCluster_DiagnosticManagement:
 /* OBJECTS                                                                    */
 /******************************************************************************/
 aapFunctionalCluster_DiagnosticManagement DiagnosticManagement;
-infClientSwcServiceDcm*                   pstinfClientSwcServiceDcm = &DiagnosticManagement;
+infClientSwcServiceDcm* const             cpstinfClientSwcServiceDcm = &DiagnosticManagement;
 
 /******************************************************************************/
 /* FUNCTIONS                                                                  */
@@ -351,11 +351,11 @@ void aapFunctionalCluster_DiagnosticManagement::vProcessResponse(void){
 void aapFunctionalCluster_DiagnosticManagement::vMainFunction(void){
    std::cout << "client\t: ";
    std::cin >> this->as8Request;
-   SwcServiceEthTp.vWrite(
+   cpstinfClientSwcServiceEthTp->vWrite(
          this->as8Request
       ,  1024
    );
-   SwcServiceEthTp.vRead(
+   cpstinfClientSwcServiceEthTp->vRead(
          this->as8Response
       ,  1024
    );
