@@ -56,8 +56,8 @@ class aapFunctionalCluster_DiagnosticManagement:
    ,  public interface_DiagnosticManagement_MultipleMonitor
 {
    private:
-      sint8 as8Request[1024];
-      sint8 as8Response[1024];
+      uint8 au8Request  [1024];
+      uint8 au8Response [1024];
 
    public:
       void         GetActivityStatus                   (void);
@@ -336,40 +336,175 @@ void aapFunctionalCluster_DiagnosticManagement::ConfigureMonitor(void){
 void aapFunctionalCluster_DiagnosticManagement::vInitFunction(void){
 }
 
-void aapFunctionalCluster_DiagnosticManagement::vProcessRequest(void){
-   (
-      0
-   == strcmp(
-                          "021101"
-         ,  (const char*) this->as8Request
-      )
-   )
-      ?  memcpy(this->as8Response, "025101",   strlen("025101\n"))
-      :  memcpy(this->as8Response, "037FXX22", strlen("037FXX22\n"))
-   ;
-   if(
-         0
-      == strcmp(
-                             "025101"
-            ,  (const char*) this->as8Response
-         )
-   ){
+#include <sstream>
+uint8 Ascii2u8(const uint8 cu8Ascii){
+   return(
+      (('0' <= cu8Ascii) && ('9' >= cu8Ascii))
+      ?  cu8Ascii - 0x30
+      :  0x00
+   );
+}
+
+uint8 String2u8(const uint8* pu8String){
+   return Ascii2u8(pu8String[0])*0x10 + Ascii2u8(pu8String[1]);
+}
+
+typedef enum{
+      Dem_eCodeResponseNegative_RejectGeneral                           = 0x10
+   ,  Dem_eCodeResponseNegative_NotSupportedService                     = 0x11
+   ,  Dem_eCodeResponseNegative_NotSupportedFunctionSub                 = 0x12
+   ,  Dem_eCodeResponseNegative_LengthMessageIncorrectOrFormatInvalid   = 0x13
+   ,  Dem_eCodeResponseNegative_TooLongResponse                         = 0x14
+   ,  Dem_eCodeResponseNegative_BusyRepeatRequest                       = 0x21
+   ,  Dem_eCodeResponseNegative_NotCorrectConditions                    = 0x22
+   ,  Dem_eCodeResponseNegative_ErrorSequenceRequest                    = 0x24
+   ,  Dem_eCodeResponseNegative_OutOfRangeRequest                       = 0x31
+   ,  Dem_eCodeResponseNegative_AccessDeniedSecurity                    = 0x33
+   ,  Dem_eCodeResponseNegative_InvalidKey                              = 0x35
+   ,  Dem_eCodeResponseNegative_NumberAttemptsExceed                    = 0x36
+   ,  Dem_eCodeResponseNegative_NotExpiredDelayTimeRequired             = 0x37
+   ,  Dem_eCodeResponseNegative_NotAcceptedUploadDownload               = 0x70
+   ,  Dem_eCodeResponseNegative_SuspendedTransferData                   = 0x71
+   ,  Dem_eCodeResponseNegative_FailureProgrammingGeneral               = 0x72
+   ,  Dem_eCodeResponseNegative_WrongCounterSequenceBlock               = 0x73
+   ,  Dem_eCodeResponseNegative_ResponsePendingRequestReceivedCorrectly = 0x78
+   ,  Dem_eCodeResponseNegative_NotSupportedInActiveSessionSubFunction  = 0x7E
+   ,  Dem_eCodeResponseNegative_NotSupportedInActiveSessionService      = 0x7F
+   ,  Dem_eCodeResponseNegative_TooHighRpm                              = 0x81
+   ,  Dem_eCodeResponseNegative_TooLowRpm                               = 0x82
+   ,  Dem_eCodeResponseNegative_RunningEngine                           = 0x83
+   ,  Dem_eCodeResponseNegative_RunningEngineNot                        = 0x84
+   ,  Dem_eCodeResponseNegative_TimeRunEngineTooLow                     = 0x85
+   ,  Dem_eCodeResponseNegative_TooHighTemperature                      = 0x86
+   ,  Dem_eCodeResponseNegative_TooLowTemperature                       = 0x87
+   ,  Dem_eCodeResponseNegative_TooHighSpeedVehicle                     = 0x88
+   ,  Dem_eCodeResponseNegative_TooLowSpeedVehicle                      = 0x89
+   ,  Dem_eCodeResponseNegative_TooHighPedalThrottle                    = 0x8A
+   ,  Dem_eCodeResponseNegative_TooLowPedalThrottle                     = 0x8B
+   ,  Dem_eCodeResponseNegative_RangeTransmissionNotInNeutral           = 0x8C
+   ,  Dem_eCodeResponseNegative_RangeTransmissionNotInGear              = 0x8D
+   ,  Dem_eCodeResponseNegative_PedalNotPressedBrake                    = 0x8F
+   ,  Dem_eCodeResponseNegative_LeverShifterNotInPark                   = 0x90
+   ,  Dem_eCodeResponseNegative_ClutchLockedTorqueConverter             = 0x91
+   ,  Dem_eCodeResponseNegative_TooHighVoltage                          = 0x92
+   ,  Dem_eCodeResponseNegative_TooLowVoltage                           = 0x93
+}Dem_eCodeResponseNegative;
+
+void vBuildNACK(
+      uint8* au8Response
+   ,  uint8  u8SID
+   ,  uint8  u8NACK
+){
+   memcpy(au8Response, "037FXX7F", strlen("037FXX7F\n")); //TBD: Hex2Ascii
+}
+
+typedef struct{
+   uint8 bSupport : 1;
+   uint8 bPadding : 7;
+}Type_stBitFieldsService;
+
+typedef struct{
+   uint8                   u8SID;
+   Type_stBitFieldsService stBitFields;
+   void                    (*vfptrHandle)(const uint8* pu8Request, uint8* pu8Response);
+}Type_stTableElementSID;
+
+void vHandler_SID_DiagnosticSessionControl(const uint8* pu8Request, uint8* pu8Response){}
+
+void vHandler_SID_ECUReset(
+      const uint8* pu8Request
+   ,        uint8* pu8Response
+){
+   uint8 u8Param = String2u8(&pu8Request[4]);
+   if(0x01 != u8Param){
+      vBuildNACK(pu8Response, 0x11, Dem_eCodeResponseNegative_LengthMessageIncorrectOrFormatInvalid);
+   }
+   else{
+      memcpy(pu8Response, "025101", strlen("025101\n")); //TBD: Hex2Ascii
       SwcServiceEcuM.vSetRequestShutdown(TRUE);
+   }
+}
+
+void vHandler_SID_ClearDiagnosticInformation      (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_ReadDTCInformation              (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_ReadDataByIdentifier            (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_SecurityAccess                  (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_CommunicationControl            (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_Authentication                  (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_ReadDataByPeriodicIdentifier    (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_DynamicallyDefineDataIdentifier (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_WriteDataByIdentifier           (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_RoutineControl                  (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_RequestDownload                 (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_RequestUpload                   (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_TransferData                    (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_RequestTransferExit             (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_RequestFileTransfer             (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_TesterPresent                   (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_ControlDTCSetting               (const uint8* pu8Request, uint8* pu8Response){}
+void vHandler_SID_ResponseOnEvent                 (const uint8* pu8Request, uint8* pu8Response){}
+
+const Type_stTableElementSID gastTableSID[] = {
+      {0x10, {0, 0}, vHandler_SID_DiagnosticSessionControl        }
+   ,  {0x11, {1, 0}, vHandler_SID_ECUReset                        }
+   ,  {0x14, {0, 0}, vHandler_SID_ClearDiagnosticInformation      }
+   ,  {0x19, {0, 0}, vHandler_SID_ReadDTCInformation              }
+   ,  {0x22, {0, 0}, vHandler_SID_ReadDataByIdentifier            }
+   ,  {0x27, {0, 0}, vHandler_SID_SecurityAccess                  }
+   ,  {0x28, {0, 0}, vHandler_SID_CommunicationControl            }
+   ,  {0x29, {0, 0}, vHandler_SID_Authentication                  }
+   ,  {0x2A, {0, 0}, vHandler_SID_ReadDataByPeriodicIdentifier    }
+   ,  {0x2C, {0, 0}, vHandler_SID_DynamicallyDefineDataIdentifier }
+   ,  {0x2E, {0, 0}, vHandler_SID_WriteDataByIdentifier           }
+   ,  {0x31, {0, 0}, vHandler_SID_RoutineControl                  }
+   ,  {0x34, {0, 0}, vHandler_SID_RequestDownload                 }
+   ,  {0x35, {0, 0}, vHandler_SID_RequestUpload                   }
+   ,  {0x36, {0, 0}, vHandler_SID_TransferData                    }
+   ,  {0x37, {0, 0}, vHandler_SID_RequestTransferExit             }
+   ,  {0x38, {0, 0}, vHandler_SID_RequestFileTransfer             }
+   ,  {0x3E, {0, 0}, vHandler_SID_TesterPresent                   }
+   ,  {0x85, {0, 0}, vHandler_SID_ControlDTCSetting               }
+   ,  {0x86, {0, 0}, vHandler_SID_ResponseOnEvent                 }
+};
+
+void aapFunctionalCluster_DiagnosticManagement::vProcessRequest(void){
+   uint8 u8SID = String2u8(&this->au8Request[2]);
+   uint8 u8Index;
+   for(
+      u8Index = 0;
+      u8Index < (sizeof(gastTableSID)/sizeof(Type_stTableElementSID));
+      u8Index ++
+   ){
+      if(u8SID == gastTableSID[u8Index].u8SID){
+         if(TRUE != gastTableSID[u8Index].stBitFields.bSupport){
+            vBuildNACK(this->au8Response, u8SID, Dem_eCodeResponseNegative_NotSupportedService);
+         }
+         else{
+            (*gastTableSID[u8Index].vfptrHandle)(
+                  this->au8Request
+               ,  this->au8Response
+            );
+         }
+         break;
+      }
+   }
+   if(u8Index >= (sizeof(gastTableSID)/sizeof(Type_stTableElementSID))){
+      vBuildNACK(this->au8Response, u8SID, Dem_eCodeResponseNegative_NotSupportedService);
    }
 }
 
 void aapFunctionalCluster_DiagnosticManagement::vMainFunction(void){
    cpstinfClientSwcServiceEthTp->vRead(
-         this->as8Request
+         this->au8Request
       ,  1024
    );
-   std::cout << "client\t: " << this->as8Request << std::endl;
+   std::cout << "client\t: " << this->au8Request << std::endl;
    this->vProcessRequest();
    cpstinfClientSwcServiceEthTp->vWrite(
-         this->as8Response
+         this->au8Response
       ,  1024
    );
-   std::cout << "server\t: " << this->as8Response << std::endl;
+   std::cout << "server\t: " << this->au8Response << std::endl << std::endl;
 }
 
 /******************************************************************************/

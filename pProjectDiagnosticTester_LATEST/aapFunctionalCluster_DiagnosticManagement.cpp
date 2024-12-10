@@ -360,7 +360,7 @@ void aapFunctionalCluster_DiagnosticManagement::vMainFunction(void){
       ,  1024
    );
    this->vProcessResponse();
-   std::cout << "server\t: " << this->as8Response << std::endl;
+   std::cout << "server\t: " << this->as8Response << std::endl << std::endl;
 }
 
 /******************************************************************************/
