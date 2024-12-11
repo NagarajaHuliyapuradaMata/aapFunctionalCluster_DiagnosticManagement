@@ -26,9 +26,6 @@
 #include "interface_DiagnosticManagement_MultipleEvent.hpp"
 #include "interface_DiagnosticManagement_MultipleMonitor.hpp"
 
-#include <iostream>
-#include <cstring>
-
 /******************************************************************************/
 /* #DEFINES                                                                   */
 /******************************************************************************/
@@ -336,19 +333,6 @@ void aapFunctionalCluster_DiagnosticManagement::ConfigureMonitor(void){
 void aapFunctionalCluster_DiagnosticManagement::vInitFunction(void){
 }
 
-#include <sstream>
-uint8 Ascii2u8(const uint8 cu8Ascii){
-   return(
-      (('0' <= cu8Ascii) && ('9' >= cu8Ascii))
-      ?  cu8Ascii - 0x30
-      :  0x00
-   );
-}
-
-uint8 String2u8(const uint8* pu8String){
-   return Ascii2u8(pu8String[0])*0x10 + Ascii2u8(pu8String[1]);
-}
-
 typedef enum{
       Dem_eCodeResponseNegative_RejectGeneral                           = 0x10
    ,  Dem_eCodeResponseNegative_NotSupportedService                     = 0x11
@@ -390,6 +374,7 @@ typedef enum{
    ,  Dem_eCodeResponseNegative_TooLowVoltage                           = 0x93
 }Dem_eCodeResponseNegative;
 
+#include <cstring>
 void vBuildNACK(
       uint8* au8Response
    ,  uint8  u8SID
@@ -415,13 +400,16 @@ void vHandler_SID_ECUReset(
       const uint8* pu8Request
    ,        uint8* pu8Response
 ){
-   uint8 u8Param = String2u8(&pu8Request[4]);
-   if(0x01 != u8Param){
-      vBuildNACK(pu8Response, 0x11, Dem_eCodeResponseNegative_LengthMessageIncorrectOrFormatInvalid);
+   if(0x01 != pu8Request[2]){
+      vBuildNACK(
+            pu8Response
+         ,  pu8Request[1]
+         ,  Dem_eCodeResponseNegative_LengthMessageIncorrectOrFormatInvalid
+      );
    }
    else{
-      memcpy(pu8Response, "025101", strlen("025101\n")); //TBD: Hex2Ascii
       SwcServiceEcuM.vSetRequestShutdown(TRUE);
+      memcpy(pu8Response, "025101", strlen("025101\n")); //TBD: Hex2Ascii
    }
 }
 
@@ -468,16 +456,19 @@ const Type_stTableElementSID gastTableSID[] = {
 };
 
 void aapFunctionalCluster_DiagnosticManagement::vProcessRequest(void){
-   uint8 u8SID = String2u8(&this->au8Request[2]);
    uint8 u8Index;
    for(
       u8Index = 0;
       u8Index < (sizeof(gastTableSID)/sizeof(Type_stTableElementSID));
       u8Index ++
    ){
-      if(u8SID == gastTableSID[u8Index].u8SID){
+      if(this->au8Request[1] == gastTableSID[u8Index].u8SID){
          if(TRUE != gastTableSID[u8Index].stBitFields.bSupport){
-            vBuildNACK(this->au8Response, u8SID, Dem_eCodeResponseNegative_NotSupportedService);
+            vBuildNACK(
+                  this->au8Response
+               ,  this->au8Request[1]
+               ,  Dem_eCodeResponseNegative_NotSupportedService
+            );
          }
          else{
             (*gastTableSID[u8Index].vfptrHandle)(
@@ -489,7 +480,11 @@ void aapFunctionalCluster_DiagnosticManagement::vProcessRequest(void){
       }
    }
    if(u8Index >= (sizeof(gastTableSID)/sizeof(Type_stTableElementSID))){
-      vBuildNACK(this->au8Response, u8SID, Dem_eCodeResponseNegative_NotSupportedService);
+      vBuildNACK(
+            this->au8Response
+         ,  this->au8Request[1]
+         ,  Dem_eCodeResponseNegative_NotSupportedService
+      );
    }
 }
 
@@ -498,13 +493,11 @@ void aapFunctionalCluster_DiagnosticManagement::vMainFunction(void){
          this->au8Request
       ,  1024
    );
-   std::cout << "client\t: " << this->au8Request << std::endl;
    this->vProcessRequest();
    cpstinfClientSwcServiceEthTp->vWrite(
          this->au8Response
       ,  1024
    );
-   std::cout << "server\t: " << this->au8Response << std::endl << std::endl;
 }
 
 /******************************************************************************/
