@@ -374,13 +374,15 @@ typedef enum{
    ,  Dem_eCodeResponseNegative_TooLowVoltage                           = 0x93
 }Dem_eCodeResponseNegative;
 
-#include <cstring>
 void vBuildNACK(
-      uint8* au8Response
-   ,  uint8  u8SID
-   ,  uint8  u8NACK
+            uint8* lpu8Response
+   ,  const uint8  lcu8SID
+   ,  const uint8  lcu8NACK
 ){
-   memcpy(au8Response, "037FXX7F", strlen("037FXX7F\n")); //TBD: Hex2Ascii
+   lpu8Response[0] = 0x03;
+   lpu8Response[1] = 0x7F;
+   lpu8Response[2] = lcu8SID;
+   lpu8Response[3] = lcu8NACK;
 }
 
 typedef struct{
@@ -397,19 +399,21 @@ typedef struct{
 void vHandler_SID_DiagnosticSessionControl(const uint8* pu8Request, uint8* pu8Response){}
 
 void vHandler_SID_ECUReset(
-      const uint8* pu8Request
-   ,        uint8* pu8Response
+      const uint8* lpcu8Request
+   ,        uint8* lpu8Response
 ){
-   if(0x01 != pu8Request[2]){
+   if(0x01 != lpcu8Request[2]){
       vBuildNACK(
-            pu8Response
-         ,  pu8Request[1]
+            lpu8Response
+         ,  lpcu8Request[1]
          ,  Dem_eCodeResponseNegative_LengthMessageIncorrectOrFormatInvalid
       );
    }
    else{
       SwcServiceEcuM.vSetRequestShutdown(TRUE);
-      memcpy(pu8Response, "025101", strlen("025101\n")); //TBD: Hex2Ascii
+      lpu8Response[0] = 0x02;
+      lpu8Response[1] = lpcu8Request[1] + 0x40;
+      lpu8Response[2] = lpcu8Request[2];
    }
 }
 
